@@ -25,4 +25,5 @@ ENV COOKIES_FILE_PATH=youtube_cookies.txt
 ENV PYTHONUNBUFFERED=1
 
 # Run only telegram bot
-CMD ["python3", "main.py"]
+CMD gunicorn app:app --bind 0.0.0.0:8080 & python3 main.py
+#CMD ["python3", "main.py"]
