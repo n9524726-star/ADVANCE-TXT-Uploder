@@ -473,11 +473,12 @@ async def upload(bot: Client, m: Message):
             content = f.read()
         content = content.split("\n")
         
-        links = []
-        for i in content:
-            if "://" in i:
-                url = i.split("://", 1)[1]
-                links.append(i.split("://", 1))
+links = []
+
+for i in content:
+    match = re.search(r'(https?://\S+)', i)
+    if match:
+        links.append(match.group(1))
                 if ".pdf" in url:
                     pdf_count += 1
                 elif url.endswith((".png", ".jpeg", ".jpg")):
