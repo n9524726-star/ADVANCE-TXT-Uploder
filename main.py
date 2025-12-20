@@ -502,28 +502,49 @@ async def upload(bot: Client, m: Message):
         f"🔹Img : {img_count}\n"
         f"🔹Pdf : {pdf_count}\n"
         f"🔹Zip : {zip_count}\n"
-        f"🔹Video : {video_count}`"
+        f"🔹Video : {video_count}`\n"
         f"𝗦𝗲𝗻𝗱 𝗙𝗿𝗼𝗺 𝗪𝗵𝗲𝗿𝗲 𝗬𝗼𝘂 𝗪𝗮𝗻𝘁 𝗧𝗼 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱.`"
     )
 
 
    
     #await editable.edit(f"`𝗧𝗼𝘁𝗮𝗹 🔗 𝗟𝗶𝗻𝗸𝘀 𝗙𝗼𝘂𝗻𝗱 𝗔𝗿𝗲 {len(links)}\n\n🔹Img : {img_count}  🔹Pdf : {pdf_count}\n🔹Zip : {zip_count}  🔹Video : {video_count}\n\n𝗦𝗲𝗻𝗱 𝗙𝗿𝗼𝗺 𝗪𝗵𝗲𝗿𝗲 𝗬𝗼𝘂 𝗪𝗮𝗻𝘁 𝗧𝗼 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱.`")
-    input0: Message = await bot.listen(editable.chat.id)
-    raw_text = input0.text
-    await input0.delete(True)
-    try:
-        arg = int(raw_text)
-    except:
-        arg = 1
-    await editable.edit("📚 𝗘𝗻𝘁𝗲𝗿 𝗬𝗼𝘂𝗿 𝗕𝗮𝘁𝗰𝗵 𝗡𝗮𝗺𝗲 📚\n\n🦠 𝗦𝗲𝗻𝗱 `1` 𝗙𝗼𝗿 𝗨𝘀𝗲 𝗗𝗲𝗳𝗮𝘂𝗹𝘁 🦠")
-    input1: Message = await bot.listen(editable.chat.id)
-    raw_text0 = input1.text
-    await input1.delete(True)
-    if raw_text0 == '1':
-        b_name = file_name
-    else:
-        b_name = raw_text0
+# ── STEP 1: Ask from where to start downloading ──
+await editable.edit(
+    "📥 **𝗦𝗲𝗻𝗱 𝗦𝘁𝗮𝗿𝘁 𝗜𝗻𝗱𝗲𝘅**\n\n"
+    "➤ Send `1` to start from beginning\n"
+    "➤ Send any number to start from that link"
+)
+
+start_msg: Message = await bot.listen(editable.chat.id)
+start_text = (start_msg.text or "").strip()
+await start_msg.delete(True)
+
+try:
+    start_from = int(start_text)
+    if start_from < 1:
+        start_from = 1
+    if start_from > len(links):
+        start_from = len(links)
+except:
+    start_from = 1
+
+
+# ── STEP 2: Ask Batch Name ──
+await editable.edit(
+    "📚 **𝗘𝗻𝘁𝗲𝗿 𝗬𝗼𝘂𝗿 𝗕𝗮𝘁𝗰𝗵 𝗡𝗮𝗺𝗲** 📚\n\n"
+    "➤ Send `1` to use default file name"
+)
+
+batch_msg: Message = await bot.listen(editable.chat.id)
+batch_text = (batch_msg.text or "").strip()
+await batch_msg.delete(True)
+
+if batch_text == "1" or batch_text == "":
+    b_name = file_name
+else:
+    b_name = batch_text
+
     
 
     await editable.edit("**📸 𝗘𝗻𝘁𝗲𝗿 𝗥𝗲𝘀𝗼𝗹𝘂𝘁𝗶𝗼𝗻 📸**\n➤ `144`\n➤ `240`\n➤ `360`\n➤ `480`\n➤ `720`\n➤ `1080`")
@@ -577,13 +598,14 @@ async def upload(bot: Client, m: Message):
     raw_text4 = input4.text
     await input4.delete(True)
     if raw_text4 == "3":
-        MR = token
+        MR = PW_TOKEN
     else:
         MR = raw_text4
     
     await editable.edit("𝗡𝗼𝘄 𝗦𝗲𝗻𝗱 𝗧𝗵𝗲 𝗧𝗵𝘂𝗺𝗯 𝗨𝗿𝗹 𝗘𝗴 » https://graph.org/file/5ac5e31be090132961587-a6dde68d91854eae0d.jpg\n\n𝗢𝗿 𝗜𝗳 𝗗𝗼𝗻'𝘁 𝗪𝗮𝗻𝘁 𝗧𝗵𝘂𝗺𝗯𝗻𝗮𝗶𝗹 𝗦𝗲𝗻𝗱 = 𝗻𝗼")
-    input6 = message = await bot.listen(editable.chat.id)
+    input6: Message = await bot.listen(editable.chat.id)
     raw_text6 = input6.text
+    #raw_text6 = input6.text
     await input6.delete(True)
     await editable.delete()
 
@@ -592,12 +614,17 @@ async def upload(bot: Client, m: Message):
         getstatusoutput(f"wget '{thumb}' -O 'thumb.jpg'")
         thumb = "thumb.jpg"
     else:
-        thumb == "no"
+        thumb = None
+    
     failed_count =0
-    if len(links) == 1:
-        count = 1
-    else:
-        count = int(raw_text)
+    try:
+       count = int(raw_text)
+    except:
+       count = 1
+
+    if count > len(links):
+       count = len(links)
+
 
     try:
         for i in range(count - 1, len(links)):
