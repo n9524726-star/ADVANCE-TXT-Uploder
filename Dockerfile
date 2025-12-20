@@ -1,4 +1,4 @@
-FROM python:3.10-slim-buster
+FROM python:3.10-slim-bullseye
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -24,5 +24,5 @@ RUN pip install --no-cache-dir pytube
 ENV COOKIES_FILE_PATH=youtube_cookies.txt
 ENV PYTHONUNBUFFERED=1
 
-# ✅ ONLY run telegram bot
+# Run only telegram bot
 CMD ["python3", "main.py"]
