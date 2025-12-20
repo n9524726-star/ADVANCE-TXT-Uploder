@@ -454,50 +454,61 @@ async def help_command(client: Client, msg: Message):
 # Upload command handler
 @bot.on_message(filters.command(["txt"]))
 async def upload(bot: Client, m: Message):
+
     if not is_authorized(m.chat.id):
         await m.reply_text("**🚫You are not authorized to use this bot.**")
         return
 
-    editable = await m.reply_text(f"⚡𝗦𝗘𝗡𝗗 𝗧𝗫𝗧 𝗙𝗜𝗟𝗘⚡")
-    input: Message = await bot.listen(editable.chat.id)
-    x = await input.download()
-    await input.delete(True)
-    file_name, ext = os.path.splitext(os.path.basename(x))
-    pdf_count = 0
-    img_count = 0
-    zip_count = 0
-    video_count = 0
-    
-try:
-    with open(x, "r") as f:
-        content = f.read().split("\n")
+    editable = await m.reply_text("⚡𝗦𝗘𝗡𝗗 𝗧𝗫𝗧 𝗙𝗜𝗟𝗘⚡")
+    input_msg: Message = await bot.listen(editable.chat.id)
 
+    x = await input_msg.download()
+    await input_msg.delete(True)
+
+    file_name, ext = os.path.splitext(os.path.basename(x))
+
+    pdf_count = img_count = zip_count = video_count = 0
     links = []
 
-    for i in content:
-        match = re.search(r'(https?://\S+)', i)
-        if match:
-            url = match.group(1)
-            links.append(url)
+    try:
+        with open(x, "r", encoding="utf-8") as f:
+            content = f.read().splitlines()
 
-            if ".pdf" in url:
-                pdf_count += 1
-            elif url.endswith((".png", ".jpeg", ".jpg")):
-                img_count += 1
-            elif ".zip" in url:
-                zip_count += 1
-            else:
-                video_count += 1
+        for line in content:
+            match = re.search(r'(https?://\S+)', line)
+            if match:
+                url = match.group(1)
+                links.append(url)
 
-    os.remove(x)
+                if url.endswith(".pdf"):
+                    pdf_count += 1
+                elif url.endswith((".jpg", ".jpeg", ".png")):
+                    img_count += 1
+                elif url.endswith(".zip"):
+                    zip_count += 1
+                else:
+                    video_count += 1
 
-except Exception as e:
-    await m.reply_text("😶𝗜𝗻𝘃𝗮𝗹𝗶𝗱 𝗙𝗶𝗹𝗲 𝗜𝗻𝗽𝘂𝘁😶")
-    os.remove(x)
-    return
+        os.remove(x)
+
+    except Exception as e:
+        await m.reply_text("😶𝗜𝗻𝘃𝗮𝗹𝗶𝗱 𝗙𝗶𝗹𝗲 𝗜𝗻𝗽𝘂𝘁😶")
+        if os.path.exists(x):
+            os.remove(x)
+        return
+
+    await editable.edit(
+        f"`𝗧𝗼𝘁𝗮𝗹 🔗 𝗟𝗶𝗻𝗸𝘀 » {len(links)}\n\n"
+        f"🔹Img : {img_count}\n"
+        f"🔹Pdf : {pdf_count}\n"
+        f"🔹Zip : {zip_count}\n"
+        f"🔹Video : {video_count}`"
+        f"𝗦𝗲𝗻𝗱 𝗙𝗿𝗼𝗺 𝗪𝗵𝗲𝗿𝗲 𝗬𝗼𝘂 𝗪𝗮𝗻𝘁 𝗧𝗼 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱.`"
+    )
+
 
    
-    await editable.edit(f"`𝗧𝗼𝘁𝗮𝗹 🔗 𝗟𝗶𝗻𝗸𝘀 𝗙𝗼𝘂𝗻𝗱 𝗔𝗿𝗲 {len(links)}\n\n🔹Img : {img_count}  🔹Pdf : {pdf_count}\n🔹Zip : {zip_count}  🔹Video : {video_count}\n\n𝗦𝗲𝗻𝗱 𝗙𝗿𝗼𝗺 𝗪𝗵𝗲𝗿𝗲 𝗬𝗼𝘂 𝗪𝗮𝗻𝘁 𝗧𝗼 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱.`")
+    #await editable.edit(f"`𝗧𝗼𝘁𝗮𝗹 🔗 𝗟𝗶𝗻𝗸𝘀 𝗙𝗼𝘂𝗻𝗱 𝗔𝗿𝗲 {len(links)}\n\n🔹Img : {img_count}  🔹Pdf : {pdf_count}\n🔹Zip : {zip_count}  🔹Video : {video_count}\n\n𝗦𝗲𝗻𝗱 𝗙𝗿𝗼𝗺 𝗪𝗵𝗲𝗿𝗲 𝗬𝗼𝘂 𝗪𝗮𝗻𝘁 𝗧𝗼 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱.`")
     input0: Message = await bot.listen(editable.chat.id)
     raw_text = input0.text
     await input0.delete(True)
@@ -565,7 +576,7 @@ except Exception as e:
     input4: Message = await bot.listen(editable.chat.id)
     raw_text4 = input4.text
     await input4.delete(True)
-    if raw_text4 == 3:
+    if raw_text4 == "3":
         MR = token
     else:
         MR = raw_text4
