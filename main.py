@@ -468,30 +468,34 @@ async def upload(bot: Client, m: Message):
     zip_count = 0
     video_count = 0
     
-    try:    
-        with open(x, "r") as f:
-            content = f.read()
-        content = content.split("\n")
-        
-links = []
+try:
+    with open(x, "r") as f:
+        content = f.read().split("\n")
 
-for i in content:
-    match = re.search(r'(https?://\S+)', i)
-    if match:
-        links.append(match.group(1))
-                if ".pdf" in url:
-                    pdf_count += 1
-                elif url.endswith((".png", ".jpeg", ".jpg")):
-                    img_count += 1
-                elif ".zip" in url:
-                    zip_count += 1
-                else:
-                    video_count += 1
-        os.remove(x)
-    except:
-        await m.reply_text("😶𝗜𝗻𝘃𝗮𝗹𝗶𝗱 𝗙𝗶𝗹𝗲 𝗜𝗻𝗽𝘂𝘁😶")
-        os.remove(x)
-        return
+    links = []
+
+    for i in content:
+        match = re.search(r'(https?://\S+)', i)
+        if match:
+            url = match.group(1)
+            links.append(url)
+
+            if ".pdf" in url:
+                pdf_count += 1
+            elif url.endswith((".png", ".jpeg", ".jpg")):
+                img_count += 1
+            elif ".zip" in url:
+                zip_count += 1
+            else:
+                video_count += 1
+
+    os.remove(x)
+
+except Exception as e:
+    await m.reply_text("😶𝗜𝗻𝘃𝗮𝗹𝗶𝗱 𝗙𝗶𝗹𝗲 𝗜𝗻𝗽𝘂𝘁😶")
+    os.remove(x)
+    return
+
    
     await editable.edit(f"`𝗧𝗼𝘁𝗮𝗹 🔗 𝗟𝗶𝗻𝗸𝘀 𝗙𝗼𝘂𝗻𝗱 𝗔𝗿𝗲 {len(links)}\n\n🔹Img : {img_count}  🔹Pdf : {pdf_count}\n🔹Zip : {zip_count}  🔹Video : {video_count}\n\n𝗦𝗲𝗻𝗱 𝗙𝗿𝗼𝗺 𝗪𝗵𝗲𝗿𝗲 𝗬𝗼𝘂 𝗪𝗮𝗻𝘁 𝗧𝗼 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱.`")
     input0: Message = await bot.listen(editable.chat.id)
