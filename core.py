@@ -282,8 +282,10 @@ async def download_video(url,cmd, name):
             return f"{name}.mkv"
 
         elif os.path.isfile(f"{name}.mp4"):
-        new_name = f"{name}.mkv"
-        subprocess.run(f'ffmpeg -i "{name}.mp4" -c copy "{new_name}"', shell=True)
+            new_name = f"{name}.mkv"
+            subprocess.run(f'ffmpeg -i 
+        "{name}.mp4" -c copy "{new_name}"', 
+        shell=True)
             return new_name
         elif os.path.isfile(f"{name}.mp4.webm"):
             return f"{name}.mp4.webm"
